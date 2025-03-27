@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Xml.XPath;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    static GameManager Instance { get; set; }
     private void Awake()
     {
         if(Instance == null)
