@@ -29,7 +29,7 @@ public class PlayerMove : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && !isStep)
         {
-            StartCoroutine(Step());
+         //   StartCoroutine(Step());
         }
     }
 
@@ -41,7 +41,7 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    IEnumerator Step() //스텝 코루틴
+    /*IEnumerator Step() //스텝 코루틴
     {
         isStep = true;
         OnStep?.Invoke();
@@ -53,7 +53,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         isStep = false;
-    }
+    }*/
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.tag == "Attack")
