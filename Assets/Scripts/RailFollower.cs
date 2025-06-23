@@ -2,29 +2,38 @@ using UnityEngine;
 
 public class RailFollower : MonoBehaviour
 {
+
+    private Vector2 _lastPosition;
+    public Vector2 CurrentDirection { get; private set; } //플레이어가 현재 이동하고 있는 방향을 저장 (이동기에 쓰임)
     public RailPath path;
 
     public float moveSpeed = 2f;
 
-    private int currentIndex = 0;
+    public int currentIndex = 0;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    private bool reverse = false;
+    public bool reverse = false;
 
     void Update()
     {
         if (!path || path.Length == 0) return;
-
+        
         Vector3 targetPos = path.GetPoint(currentIndex);
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
 
-        if (Vector3.Distance(transform.position, targetPos) < 0.05f)
+        if (!reverse) //CurrentDirection 계산
+        {
+            if (currentIndex > 0)
+                CurrentDirection = (path.GetPoint(currentIndex) - path.GetPoint(currentIndex - 1)).normalized;
+        }
+        else
+        {
+            if (currentIndex < path.Length - 1)
+                CurrentDirection = (path.GetPoint(currentIndex) - path.GetPoint(currentIndex + 1)).normalized;
+        }
+        //이동하기
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+        
+        //왕복시켜주는 로직
+        if (Vector2.Distance(transform.position, targetPos) < 0.05f) //position이랑 가까워지면 인덱스 갱신
         {
             if (!reverse) currentIndex++;
             else currentIndex--;
