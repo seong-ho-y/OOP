@@ -1,30 +1,40 @@
 using UnityEngine;
 
+/// <summary>
+/// 플레이어 조작 및 총괄을 담당
+/// 진짜 플레이어가 이동하는건 RailFollower에 있지만 여기에서 플레이어 조작을 담당함
+/// player의 중앙시스템 (creature, railfollower, weapon 컴포넌트를 가짐)
+/// </summary>
 public class Player : MonoBehaviour
 {
-    //플레이어 이동 로직을 담당
     
     //필드
+    //이동속도 관련 변수
+    public float normalSpeed;
     
-    //dodge 관련 변수들
-    public float dodgeForce = 1f;
-    public float dodgeDuration = 2f;
-    public bool isdodging = false;
+    //dodge 관련 변수
+    public float dodgeDuration = 0.39f; // dodge 시간
+    public float dodgeCoolDown = 2f; // dodge 쿨타임 - 회피 종료 이후 계산되는거롤 할거임 EndDodge에서 계산
+    public float dodgeSpeed = 2f;
+    public bool dodgeAble = true;
+    public bool isDodging = false;
     
     
     
     private Rigidbody2D _rb;
     private RailFollower _rail;
-    
+    private Creature _cr;
     
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _rail = GetComponent<RailFollower>();
+        _cr = GetComponent<Creature>();
     }
     void Start()
     {
         Debug.Log("Start_Player");
+        _rail.moveSpeed = normalSpeed;
     }
 
     // Update is called once per frame
@@ -35,6 +45,14 @@ public class Player : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log(other.name);
+        if (isDodging)
+        {
+            Debug.Log("!!저스트 회피!!");
+        }
+        else
+        {
+            //_cr.TakeDamage();
+        }
     }
 
     void OnJump() //spacebar 입력받기
@@ -48,31 +66,28 @@ public class Player : MonoBehaviour
     //쌍검 - 스텝 (먼 거리, 긴 무적시간)
     //
     {
-        if (isdodging) return;
+        if (isDodging || !dodgeAble) return;
         
-        isdodging = true;
+        isDodging = true;
+        dodgeAble = false;
         Debug.Log("Dodge");
 
-        _rail.moveSpeed = 2f;
+        _rail.moveSpeed = dodgeSpeed;
         
         Invoke(nameof(EndDoge), dodgeDuration);
     }
 
     void EndDoge()
     {
-        _rail.moveSpeed = 1f;
-        isdodging = false;
+        _rail.moveSpeed = normalSpeed;
+        isDodging = false;
+
+        Invoke(nameof(ResetDodge), dodgeCoolDown);
     }
-}
 
-
-
-public class PlayerInfo : Creature
-{
-    public PlayerInfo(int health, int stamina, int speed) : base(health, stamina, speed)
+    void ResetDodge()
     {
-        health = 20;
-        stamina = 10;
-        speed = 5;
+        dodgeAble = true;
     }
 }
+

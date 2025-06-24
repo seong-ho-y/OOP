@@ -6,8 +6,8 @@ public class RailFollower : MonoBehaviour
     private Vector2 _lastPosition;
     public Vector2 CurrentDirection { get; private set; } //플레이어가 현재 이동하고 있는 방향을 저장 (이동기에 쓰임)
     public RailPath path;
-
-    public float moveSpeed = 2f;
+    
+    public float moveSpeed;
 
     public int currentIndex = 0;
     
