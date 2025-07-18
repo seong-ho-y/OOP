@@ -51,7 +51,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            //_cr.TakeDamage();
+            _cr.TakeDamage(other.GetComponent<Creature>().Damage);
         }
     }
 
