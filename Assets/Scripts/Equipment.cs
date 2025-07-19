@@ -15,8 +15,9 @@ public class Equipment : MonoBehaviour, IEquiable, ICraftable, IUpgradable
     }
 
     //장비를 해금시키는 메서드 (장비 제작에 필요한 소재를 다 모았을 때에 장비UI, 제작, 강화, 뽑기 해금
-    public bool CanCraft(Dictionary<string, int> playerMaterials, Dictionary<string, int> equipmentMaterials)
+    public bool CanCraft(Dictionary<string, int> equipmentMaterials)
     {
+        Dictionary<string, int> playerMaterials = GameManager.Instance.PlayerMaterials;
         if (playerMaterials == null || equipmentMaterials == null)
         {
             throw new System.ArgumentNullException();
@@ -50,19 +51,20 @@ public class Equipment : MonoBehaviour, IEquiable, ICraftable, IUpgradable
         return true;
     }
 
-    public void Craft(Dictionary<string, int> playerMaterials, Dictionary<string, int> equipmentMaterials)
+    // 장비 제작하는 메서드
+    public void Craft(Dictionary<string, int> equipmentMaterials)
     {
-        if (CanCraft(playerMaterials, equipmentMaterials))
+        Dictionary<string, int> playerMaterials = GameManager.Instance.PlayerMaterials;
+        if (CanCraft(equipmentMaterials))
         {
             foreach (KeyValuePair<string, int> requiredMaterial in equipmentMaterials)
             {
                 string materialName = requiredMaterial.Key;
                 int requiredAmount = requiredMaterial.Value;
-
-
-                int playerMateiralAmount = playerMaterials[materialName];
-                playerMateiralAmount -= requiredAmount;
+                
+                GameManager.Instance.RemoveMaterial(materialName, requiredAmount);
             }
+            Equip();
         }
     }
 
@@ -86,8 +88,8 @@ public interface IEquiable
 
 public interface ICraftable
 {
-    bool CanCraft(Dictionary<string, int> playerMaterials, Dictionary<string, int> equipmentMaterials);
-    void Craft(Dictionary<string, int> playerMaterials, Dictionary<string, int> equipmentMaterials);
+    bool CanCraft(Dictionary<string, int> equipmentMaterials);
+    void Craft(Dictionary<string, int> equipmentMaterials);
 }
 
 public interface IUpgradable
