@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-
+        Dictionary<string, int> playerMaterials = new Dictionary<string, int>();
     }
 
     // Update is called once per frame
