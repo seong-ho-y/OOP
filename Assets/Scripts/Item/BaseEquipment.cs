@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Equipment : MonoBehaviour, IEquiable, ICraftable, IUpgradable
+public class BaseEquipment : MonoBehaviour, IEquiable, IUpgradable
 {
     public string Name { get; }
     public void Equip()
@@ -62,7 +62,7 @@ public class Equipment : MonoBehaviour, IEquiable, ICraftable, IUpgradable
                 string materialName = requiredMaterial.Key;
                 int requiredAmount = requiredMaterial.Value;
                 
-                GameManager.Instance.RemoveMaterial(materialName, requiredAmount);
+                GameManager.Instance.UseMaterial(materialName, requiredAmount);
             }
             Equip();
         }
@@ -84,12 +84,6 @@ public interface IEquiable
     string Name { get; }
     public void Equip();
     public void UnEquip();
-}
-
-public interface ICraftable
-{
-    bool CanCraft(Dictionary<string, int> equipmentMaterials);
-    void Craft(Dictionary<string, int> equipmentMaterials);
 }
 
 public interface IUpgradable
