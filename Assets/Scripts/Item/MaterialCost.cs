@@ -5,6 +5,6 @@ using System;
 [Serializable]
 public class MaterialCost
 {
-    public string itemName;
+    public BaseItemData MaterialItemData;
     public int cost;
 }

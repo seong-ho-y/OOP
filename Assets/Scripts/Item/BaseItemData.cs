@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public interface ICraftable
 {
-    public Dictionary<string, int> GetRequiredMaterials();
+    public Dictionary<BaseItemData, int> GetRequiredMaterials();
     public void OnCrafted();
 }
 public class BaseItemData : ScriptableObject, ICraftable
@@ -21,22 +21,27 @@ public class BaseItemData : ScriptableObject, ICraftable
     [Header("Crafting Recipe")]
     public List<MaterialCost> craftingMaterials = new List<MaterialCost>();
 
-    public virtual Dictionary<string, int> GetRequiredMaterials()
+    public virtual Dictionary<BaseItemData, int> GetRequiredMaterials()
     {
-        Dictionary<string, int> materialDict = new Dictionary<string, int>();
-        foreach (var material in craftingMaterials)
+        Dictionary<BaseItemData, int> materialsDict = new Dictionary<BaseItemData, int>();
+        foreach (var matCost in craftingMaterials)
         {
-            if (materialDict.ContainsKey(material.itemName))
+            if (matCost.MaterialItemData == null)
             {
-                materialDict[material.itemName] += material.cost;
+                Debug.LogError($"MaterialCost in {itemName} has a null MaterialItemData reference!");
+                continue;
+            }
+
+            if (materialsDict.ContainsKey(matCost.MaterialItemData))
+            {
+                materialsDict[matCost.MaterialItemData] += matCost.cost;
             }
             else
             {
-                materialDict.Add(material.itemName, material.cost);
+                materialsDict.Add(matCost.MaterialItemData, matCost.cost);
             }
         }
-
-        return materialDict;
+        return materialsDict;
     }
 
     public void OnCrafted()

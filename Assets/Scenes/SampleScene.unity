@@ -389,6 +389,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normalSpeed: 1
+  dodgeDuration: 0.39
   dodgeCoolDown: 2
   dodgeSpeed: 2
   dodgeAble: 1
