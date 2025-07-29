@@ -21,7 +21,8 @@ public class PlayerAttack : MonoBehaviour
     private Player _player;
     
     // --- 이번 공격으로 몬스터를 타격했는지 여부 ---
-    private bool monsterHitThisAttack = false; 
+    private bool monsterHitThisAttack = false;
+    private float finaldamage = 0f;
     
     [Header("Attack Movement Target")]
     public float attackTargetYPosition = 4.3f; // 플레이어가 공격 시 도달할 목표 Y 좌표 (월드 좌표계)
@@ -63,7 +64,8 @@ public class PlayerAttack : MonoBehaviour
         _player = GetComponent<Player>();
         _railFollowComponent = GetComponent<RailFollower>();
         // 실제 게임에서는 무기 교체 시스템을 통해 호출될 것입니다.
-        EquipWeapon(new GreatSword(this, _player), new WeaponStats(100f, ElementType.None, DamageType.Slash, 1.0f, 0.1f)); // 초기 무기 장착
+        EquipWeapon(new GreatSword(this, _player), new WeaponStats(10f, ElementType.None, DamageType.Slash, 1.0f, 0.2f)); // 초기 무기 장착
+        finaldamage = currentWeaponStats.baseDamage;
         if (attackHitbox != null)
         {
             attackHitbox.enabled = false;
@@ -87,6 +89,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 UpdateChargeLevelEffect(currentChargeLevel); // 현재 단계 이펙트로 교체
                 currentChargeLevel++;
+                finaldamage += 15f;
                 nextChargeThreshold += 1f; // 다음 단계 시간 설정
             }
         }
@@ -236,7 +239,7 @@ public class PlayerAttack : MonoBehaviour
 
                     // 데미지 계산 및 적용
                     Debug.Log($"Hit: {targetCreature.CreatureName} during attack movement! Applying base damage: {currentWeaponStats.baseDamage}");
-                    targetCreature.TakeDamage((int)currentWeaponStats.baseDamage); 
+                    targetCreature.TakeDamage((int)finaldamage); 
 
                     // --- 핵심 변경: 몬스터 피격 성공 시 플래그 설정 ---
                     monsterHitThisAttack = true; 
@@ -334,6 +337,7 @@ public class PlayerAttack : MonoBehaviour
             Debug.Log("레일 이동 재개.");
         }
         monsterHitThisAttack = false;
+        finaldamage = currentWeaponStats.baseDamage;
     }
     public GameObject guardEffectPrefab; // 인스펙터에서 할당
     private GameObject activeGuardEffect;
