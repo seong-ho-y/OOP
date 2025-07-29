@@ -18,12 +18,13 @@ public class PlayerAttack : MonoBehaviour
     private RailFollower _railFollowComponent; // 실제 RailFollow 스크립트 타입으로 변경 권장
     private Vector3 initialPlayerPosition; // 공격 시작 전 플레이어 위치
     private bool isAttackingMovement = false; // 공격 이동 중인지 여부
+    private Player _player;
     
     // --- 이번 공격으로 몬스터를 타격했는지 여부 ---
     private bool monsterHitThisAttack = false; 
     
     [Header("Attack Movement Target")]
-    public float attackTargetYPosition = 10f; // 플레이어가 공격 시 도달할 목표 Y 좌표 (월드 좌표계)
+    public float attackTargetYPosition = 4.3f; // 플레이어가 공격 시 도달할 목표 Y 좌표 (월드 좌표계)
 
     // --- 차징 공격을 위한 변수 (대검/해머 등) ---
     // 이 변수는 장착된 무기 타입에 따라 true/false가 되어야 합니다.
@@ -34,11 +35,16 @@ public class PlayerAttack : MonoBehaviour
     private float currentChargeTime;
     private bool isCharging = false;             // 현재 차징 중인가?
     private Coroutine currentAttackCoroutine; // 현재 진행 중인 공격 코루틴 참조
+    private bool pendingChargeCheck = false;
+    private Coroutine chargeCheckCoroutine;
+
+    [SerializeField] private float chargeHoldDelay = 0.15f; // 몇 초 이상 정지 시 차징으로 간주
+    [SerializeField] private float chargeHoldMoveThreshold = 10f; // 이동량이 이 이하일 때만 차징 시작
 
     // --- 모바일 입력 처리 ---
     private Vector2 touchStartPosition;
     private float touchStartTime;
-    public float swipeThreshold = 50f;          // 스와이프 인식을 위한 최소 이동 거리 (픽셀 단위)
+    public float swipeThreshold = 20f;          // 스와이프 인식을 위한 최소 이동 거리 (픽셀 단위)
     public float tapMaxDuration = 0.2f;         // 탭 인식을 위한 최대 터치 시간 (초)
     
     // --- 공격 콜라이더 ---
@@ -50,9 +56,10 @@ public class PlayerAttack : MonoBehaviour
     // 스크립트 시작 시 기본 무기 장착 (테스트용)
     void Start()
     {
+        _player = GetComponent<Player>();
         _railFollowComponent = GetComponent<RailFollower>();
         // 실제 게임에서는 무기 교체 시스템을 통해 호출될 것입니다.
-        EquipWeapon(new GreatSword(this), new WeaponStats(100f, ElementType.None, DamageType.Slash, 1.0f, 8f, 0.2f)); // 초기 무기 장착
+        EquipWeapon(new GreatSword(this, _player), new WeaponStats(100f, ElementType.None, DamageType.Slash, 1.0f, 0.3f)); // 초기 무기 장착
         if (attackHitbox != null)
         {
             attackHitbox.enabled = false;
@@ -81,14 +88,10 @@ public class PlayerAttack : MonoBehaviour
                 touchStartTime = Time.time;
                 isCharging = false;
 
-                if (!isAttackingMovement) // 공격 중이 아닐 때만 시작
+                if (!isAttackingMovement && weaponSupportsChargeAttack)
                 {
-                    if (weaponSupportsChargeAttack)
-                    {
-                        isCharging = true;
-                        currentChargeTime = 0f;
-                        // playerAnimator.SetTrigger("ChargeStart");
-                    }
+                    pendingChargeCheck = true;
+                    chargeCheckCoroutine = StartCoroutine(DelayedChargeStart(touchStartPosition));
                 }
             }
             else if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
@@ -102,23 +105,20 @@ public class PlayerAttack : MonoBehaviour
             }
             else if (touch.phase == TouchPhase.Ended)
             {
+                if (chargeCheckCoroutine != null) StopCoroutine(chargeCheckCoroutine);
+                pendingChargeCheck = false;
+
                 float touchDuration = Time.time - touchStartTime;
                 Vector2 touchEndPosition = touch.position;
                 Vector2 swipeVector = touchEndPosition - touchStartPosition;
                 float swipeMagnitude = swipeVector.magnitude;
 
-                // 공격 이동 중에는 다른 입력 무시 (방어/회피 등은 공격 중에도 허용할지 결정)
-                if (isAttackingMovement)
-                {
-                    // 여기서는 일단 공격 중 다른 입력은 무시하도록 합니다.
-                    // 만약 공격 중에도 회피/가드 등이 가능하다면, 이 부분을 조건부로 처리
-                    // isCharging = false; // 공격 중에는 차징 해제
-                    return;
-                }
+                if (isAttackingMovement) return;
 
-                // 스와이프 처리
                 if (swipeMagnitude > swipeThreshold)
                 {
+                    isCharging = false;
+
                     if (Mathf.Abs(swipeVector.y) > Mathf.Abs(swipeVector.x))
                     {
                         if (swipeVector.y > 0) currentWeaponAction.SwipeUp();
@@ -139,11 +139,13 @@ public class PlayerAttack : MonoBehaviour
                         if (touchDuration <= tapMaxDuration)
                         {
                             // 탭
+                            isAttackingMovement = true;
                             currentAttackCoroutine = StartCoroutine(currentWeaponAction.Attack(this, false)); // 차징 아님
                         }
                         else
                         {
                             // 홀드 & 릴리즈
+                            isAttackingMovement = true;
                             currentAttackCoroutine =
                                 StartCoroutine(currentWeaponAction.Attack(this, true, currentChargeTime,
                                     maxChargeTime)); // 차징 맞음
@@ -202,7 +204,7 @@ public class PlayerAttack : MonoBehaviour
 
 
     // --- 공격 이동 제어 메서드 (2D 버전으로 수정) ---
-    public IEnumerator PerformAttackMovement(float moveDistance, float moveDuration)
+    public IEnumerator PerformAttackMovement(float moveSpeed)
     {
         if (_railFollowComponent != null)
         {
@@ -215,8 +217,6 @@ public class PlayerAttack : MonoBehaviour
         // 목표 위치는 initialPlayerPosition의 X, Z는 그대로 유지하고 Y만 attackTargetYPosition으로 변경
         Vector3 targetPosition = new Vector3(initialPlayerPosition.x, attackTargetYPosition, initialPlayerPosition.z); 
         
-        float startTime = Time.time;
-        float endTime = startTime + moveDuration;
         bool reachedEndNormally = true; // 끝까지 도달했는지 여부 플래그
 
         // 공격 히트박스 활성화 및 기록 초기화
@@ -228,7 +228,7 @@ public class PlayerAttack : MonoBehaviour
         }
 
         // --- 이동 루프: 시간이 끝나거나 몬스터 피격 시까지 ---
-        while (Time.time < endTime) 
+        while (transform.position.y <= attackTargetYPosition) 
         {
             if (monsterHitThisAttack) // 몬스터가 피격되어 플래그가 설정되면
             {
@@ -236,9 +236,7 @@ public class PlayerAttack : MonoBehaviour
                 reachedEndNormally = false; // 끝까지 도달하지 못했음을 표시
                 break; // 이동 루프 즉시 종료
             }
-
-            float t = (Time.time - startTime) / moveDuration;
-            transform.position = Vector3.Lerp(initialPlayerPosition, targetPosition, t);
+            transform.position += new Vector3(0, moveSpeed, 0);
             yield return null; 
         }
 
@@ -264,24 +262,21 @@ public class PlayerAttack : MonoBehaviour
 
         // --- 복귀 로직 시작 ---
         // 몬스터 피격 여부와 상관없이 이 시점에서 항상 복귀 코루틴 호출
-        yield return StartCoroutine(ReturnToRailAfterAttack(currentWeaponStats.attackMoveDuration));
+        yield return StartCoroutine(ReturnToRailAfterAttack(currentWeaponStats.attackMoveSpeed));
 
         // 모든 공격 프로세스가 완료된 후 최종 상태 업데이트
         isAttackingMovement = false; // 공격 상태 종료 (재공격 가능)
         Debug.Log("모든 공격 프로세스 완료.");
     }
 
-    public IEnumerator ReturnToRailAfterAttack(float returnDuration)
+    public IEnumerator ReturnToRailAfterAttack(float moveSpeed)
     {
         Vector3 currentAttackEndPosition = transform.position; // 현재 멈춘 위치에서 복귀 시작
-        float startTime = Time.time;
-        float endTime = startTime + returnDuration;
 
         Debug.Log("레일로 복귀 시작.");
-        while (Time.time < endTime)
+        while (transform.position.y >= initialPlayerPosition.y )
         {
-            float t = (Time.time - startTime) / returnDuration;
-            transform.position = Vector3.Lerp(currentAttackEndPosition, initialPlayerPosition, t);
+            transform.position -= new Vector3(0, moveSpeed, 0);
             yield return null;
         }
         transform.position = initialPlayerPosition; // 정확한 원위치로 복귀
@@ -291,6 +286,7 @@ public class PlayerAttack : MonoBehaviour
             _railFollowComponent.enabled = true; // 레일 이동 스크립트 재활성화
             Debug.Log("레일 이동 재개.");
         }
+        monsterHitThisAttack = false;
     }
 
     // --- 공격 범위 디버깅 ---

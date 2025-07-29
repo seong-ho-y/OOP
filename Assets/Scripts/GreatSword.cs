@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class GreatSword : IWeaponAction
 {
-    private PlayerAttack playerAttackRef; // PlayerAttack 참조 저장
-
-    public GreatSword(PlayerAttack paRef) // 생성자에서 PlayerAttack 참조를 받음
+    private PlayerAttack playerAttackRef; // PlayerAttack 참조 저
+    private Player player;
+    public GreatSword(PlayerAttack paRef, Player p) // 생성자에서 PlayerAttack 참조를 받음
     {
         playerAttackRef = paRef;
+        player = p;
     }
 
     // IWeaponAction 인터페이스의 Attack 메서드 구현
@@ -21,7 +22,7 @@ public class GreatSword : IWeaponAction
         Debug.Log("대검 공격 애니메이션 시작");
 
         // 2. 공격 이동 시작 (이동하면서 콜라이더 활성화 및 충돌 감지)
-        yield return playerAttack.StartCoroutine(playerAttack.PerformAttackMovement(stats.attackMoveDistance, stats.attackMoveDuration));
+        yield return playerAttack.StartCoroutine(playerAttack.PerformAttackMovement(stats.attackMoveSpeed));
 
         // 3. 데미지 계산 (실제 데미지는 OnTriggerEnter2D에서 적용되지만, 여기서 최종 데미지 값을 설정할 수 있음)
         float finalDamage = stats.baseDamage;
@@ -43,7 +44,7 @@ public class GreatSword : IWeaponAction
         // 여기서는 일단 간략화하여 baseDamage를 사용합니다.
 
         // 4. 공격 후 플레이어 복귀
-        yield return playerAttack.StartCoroutine(playerAttack.ReturnToRailAfterAttack(stats.attackMoveDuration));
+        yield return playerAttack.StartCoroutine(playerAttack.ReturnToRailAfterAttack(stats.attackMoveSpeed));
 
         Debug.Log("대검 공격 프로세스 완료");
     }
@@ -51,6 +52,16 @@ public class GreatSword : IWeaponAction
     // 다른 IWeaponAction 메서드들은 기존과 동일하게 구현
     public void SwipeDown() { Debug.Log("가드"); }
     public void SwipeUp() { Debug.Log("모으기 강화"); }
-    public void SwipeLeft() { Debug.Log("왼쪽 회피 (대검)"); }
-    public void SwipeRight() { Debug.Log("오른쪽 회피 (대검)"); }
+
+    public void SwipeLeft()
+    {
+        player.Dodge(-1);
+        Debug.Log("왼쪽 회피 (대검)");
+    }
+
+    public void SwipeRight()
+    {
+        player.Dodge(1);
+        Debug.Log("오른쪽 회피 (대검)");
+    }
 }

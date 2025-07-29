@@ -54,13 +54,9 @@ public class Player : Creature
             //_cr.TakeDamage(other.GetComponent<Creature>().Damage);
         }
     }
+    
 
-    void OnJump() //spacebar 입력받기
-    {
-        Dodge();
-    }
-
-    void Dodge() //회피
+    public void Dodge(int direction) //회피 (direction -1 왼쪽, +1 오른쪽)
     //회피는 무기벼롤 다름
     //대검 - 구르기 (짧은 거리, 짧은 무적시간)
     //쌍검 - 스텝 (먼 거리, 긴 무적시간)
@@ -71,8 +67,15 @@ public class Player : Creature
         isDodging = true;
         dodgeAble = false;
         Debug.Log("Dodge");
-
-        _rail.moveSpeed = dodgeSpeed;
+        switch (direction)
+        {
+            case 1:
+                _rail.moveSpeed = Mathf.Abs(dodgeSpeed);
+                break;
+            case -1 :
+                _rail.moveSpeed = -1 * Mathf.Abs(dodgeSpeed);
+                break;
+        }
         
         Invoke(nameof(EndDoge), dodgeDuration);
     }

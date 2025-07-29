@@ -11,17 +11,15 @@ public class WeaponStats
     public ElementType element;
     public DamageType damageType;
     public float attackRange;           // 공격 판정 거리 (레이캐스트/콜라이더 길이)
-    public float attackMoveDistance;    // 공격 시 플레이어가 전진할 거리 (예: 2m)
-    public float attackMoveDuration;    // 공격 전진에 걸리는 시간 (예: 0.2초) - 이 값이 속도를 결정
+    public float attackMoveSpeed;    // 공격 시 플레이어가 이동하는 속도
 
-    public WeaponStats(float baseDamage, ElementType element, DamageType damageType, float attackRange, float attackMoveDistance, float attackMoveDuration)
+    public WeaponStats(float baseDamage, ElementType element, DamageType damageType, float attackRange, float attackMoveSpeed)
     {
         this.baseDamage = baseDamage;
         this.element = element;
         this.damageType = damageType;
         this.attackRange = attackRange;
-        this.attackMoveDistance = attackMoveDistance;
-        this.attackMoveDuration = attackMoveDuration;
+        this.attackMoveSpeed = attackMoveSpeed;
     }
 }
 public interface IWeaponAction
