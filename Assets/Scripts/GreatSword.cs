@@ -6,10 +6,12 @@ public class GreatSword : IWeaponAction
 {
     private PlayerAttack playerAttackRef; // PlayerAttack 참조 저
     private Player player;
+    private RailFollower _rF;
     public GreatSword(PlayerAttack paRef, Player p) // 생성자에서 PlayerAttack 참조를 받음
     {
         playerAttackRef = paRef;
         player = p;
+        _rF = paRef.GetComponent<RailFollower>();
     }
 
     // IWeaponAction 인터페이스의 Attack 메서드 구현
@@ -48,9 +50,46 @@ public class GreatSword : IWeaponAction
 
         Debug.Log("대검 공격 프로세스 완료");
     }
+    
+    private Coroutine guardCoroutine;
 
-    // 다른 IWeaponAction 메서드들은 기존과 동일하게 구현
-    public void SwipeDown() { Debug.Log("가드"); }
+    public void SwipeDown()
+    {
+        if (guardCoroutine != null)
+        {
+            playerAttackRef.StopCoroutine(guardCoroutine);
+        }
+        guardCoroutine = playerAttackRef.StartCoroutine(GuardRoutine());
+    }
+
+    private IEnumerator GuardRoutine()
+    {
+        Debug.Log("가드 시작");
+        // 차징 초기화
+        playerAttackRef.isCharging = false;
+        playerAttackRef.currentChargeTime = 0f;
+        playerAttackRef.pendingChargeCheck = false;
+        _rF.enabled = false;
+        playerAttackRef.ShowGuardEffect(1f);
+
+        // 플레이어 이동 멈춤
+        playerAttackRef.enabled = false; // 공격 입력/이동 스크립트 비활성화 (필요에 따라)
+        player.enabled = false; // 플레이어 컨트롤러 자체 비활성화도 필요할 수 있음
+
+        // 방어력 증가 (임시로 player 스탯에 직접 적용했다고 가정)
+
+        // 방어 효과 유지 시간 1초 대기
+        yield return new WaitForSeconds(1.0f);
+
+        // 방어력 원복
+
+        // 플레이어 이동 및 입력 다시 활성화
+        playerAttackRef.enabled = true;
+        player.enabled = true;
+        _rF.enabled = true;
+
+        Debug.Log("가드 종료");
+    }
     public void SwipeUp() { Debug.Log("모으기 강화"); }
 
     public void SwipeLeft()

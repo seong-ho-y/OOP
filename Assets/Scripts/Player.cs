@@ -67,16 +67,8 @@ public class Player : Creature
         isDodging = true;
         dodgeAble = false;
         Debug.Log("Dodge");
-        switch (direction)
-        {
-            case 1:
-                _rail.moveSpeed = Mathf.Abs(dodgeSpeed);
-                break;
-            case -1 :
-                _rail.moveSpeed = -1 * Mathf.Abs(dodgeSpeed);
-                break;
-        }
-        
+        _rail.NudgeIndex(direction);
+        _rail.moveSpeed = dodgeSpeed;
         Invoke(nameof(EndDoge), dodgeDuration);
     }
 

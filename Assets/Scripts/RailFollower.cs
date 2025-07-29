@@ -1,3 +1,5 @@
+using System.ComponentModel.Design;
+using System.IO;
 using UnityEngine;
 
 public class RailFollower : MonoBehaviour
@@ -49,5 +51,28 @@ public class RailFollower : MonoBehaviour
                 reverse = false;
             }
         }
+    }
+    public void NudgeIndex(int direction)
+    {
+        if (!path || path.Length < 2) return;
+
+        // 예외처리
+        if (direction < 0 && currentIndex <= 0) return; // 왼쪽으로 못 감
+        if (direction > 0 && currentIndex >= path.Length - 1) return; // 오른쪽으로 못 감
+
+        
+        if (!((direction < 0 && reverse) || (direction > 0 && !reverse)))
+        {
+            currentIndex += direction;
+            if (direction < 0)
+            {
+                reverse = true;
+            }
+            else
+            {
+                reverse = false;
+            }
+        }
+
     }
 }

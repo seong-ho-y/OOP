@@ -30,13 +30,17 @@ public class PlayerAttack : MonoBehaviour
     // 이 변수는 장착된 무기 타입에 따라 true/false가 되어야 합니다.
     // GreatSword 같은 클래스에서 직접 이 정보를 제공하는 것이 더 좋습니다.
     // 여기서는 일단 public으로 두어 테스트 편의성을 높입니다.
+    [SerializeField] private List<GameObject> chargeLevelEffects; 
+    private int currentChargeLevel = 0;
+    private float nextChargeThreshold = 1f; // 다음 단계로 넘어갈 시간
+    private GameObject currentChargingEffectInstance;
     public bool weaponSupportsChargeAttack = false; // 현재 장착된 무기가 차징 공격을 지원하는가?
     public float maxChargeTime = 2.0f;           // 최대 차징 시간
-    private float currentChargeTime;
-    private bool isCharging = false;             // 현재 차징 중인가?
-    private Coroutine currentAttackCoroutine; // 현재 진행 중인 공격 코루틴 참조
-    private bool pendingChargeCheck = false;
-    private Coroutine chargeCheckCoroutine;
+    public float currentChargeTime;
+    public bool isCharging = false;             // 현재 차징 중인가?
+    public Coroutine currentAttackCoroutine; // 현재 진행 중인 공격 코루틴 참조
+    public bool pendingChargeCheck = false;
+    public Coroutine chargeCheckCoroutine;
 
     [SerializeField] private float chargeHoldDelay = 0.15f; // 몇 초 이상 정지 시 차징으로 간주
     [SerializeField] private float chargeHoldMoveThreshold = 10f; // 이동량이 이 이하일 때만 차징 시작
@@ -59,7 +63,7 @@ public class PlayerAttack : MonoBehaviour
         _player = GetComponent<Player>();
         _railFollowComponent = GetComponent<RailFollower>();
         // 실제 게임에서는 무기 교체 시스템을 통해 호출될 것입니다.
-        EquipWeapon(new GreatSword(this, _player), new WeaponStats(100f, ElementType.None, DamageType.Slash, 1.0f, 0.3f)); // 초기 무기 장착
+        EquipWeapon(new GreatSword(this, _player), new WeaponStats(100f, ElementType.None, DamageType.Slash, 1.0f, 0.1f)); // 초기 무기 장착
         if (attackHitbox != null)
         {
             attackHitbox.enabled = false;
@@ -74,6 +78,19 @@ public class PlayerAttack : MonoBehaviour
     void Update()
     {
         HandleTouchInput(); // 매 프레임 터치 입력 처리
+        if (isCharging)
+        {
+            currentChargeTime += Time.deltaTime;
+
+            // 다음 단계 도달했는지 확인
+            if (currentChargeTime >= nextChargeThreshold && currentChargeLevel < chargeLevelEffects.Count)
+            {
+                UpdateChargeLevelEffect(currentChargeLevel); // 현재 단계 이펙트로 교체
+                currentChargeLevel++;
+                nextChargeThreshold += 1f; // 다음 단계 시간 설정
+            }
+        }
+        
     }
 
     void HandleTouchInput()
@@ -107,7 +124,14 @@ public class PlayerAttack : MonoBehaviour
             {
                 if (chargeCheckCoroutine != null) StopCoroutine(chargeCheckCoroutine);
                 pendingChargeCheck = false;
+                if (currentChargingEffectInstance != null)
+                {
+                    Destroy(currentChargingEffectInstance);
+                    currentChargingEffectInstance = null;
+                }
 
+                currentChargeLevel = 0;
+                nextChargeThreshold = 1f;
                 float touchDuration = Time.time - touchStartTime;
                 Vector2 touchEndPosition = touch.position;
                 Vector2 swipeVector = touchEndPosition - touchStartPosition;
@@ -155,7 +179,30 @@ public class PlayerAttack : MonoBehaviour
             }
         }
     }
+    private IEnumerator DelayedChargeStart(Vector2 startPos)
+    {
+        yield return new WaitForSeconds(chargeHoldDelay);
 
+        if (!pendingChargeCheck) yield break;
+
+        Vector2 currentPos = Input.GetTouch(0).position;
+        float distance = Vector2.Distance(startPos, currentPos);
+
+        if (distance < chargeHoldMoveThreshold)
+        {
+            isCharging = true;
+            currentChargeTime = 0f;
+            _railFollowComponent.enabled = false;
+            Debug.Log("✅ 차지 공격 시작 조건 충족됨");
+            StartChargingEffect(); // ✅ 여기서 호출
+        }
+        else
+        {
+            Debug.Log("❌ 너무 많이 움직여서 차지 조건 실패");
+        }
+
+        pendingChargeCheck = false;
+    }
     // 무기 장착 함수 (외부에서 호출될 수 있도록 public)
     public void EquipWeapon(IWeaponAction newWeaponAction, WeaponStats newWeaponStats)
     {
@@ -288,7 +335,34 @@ public class PlayerAttack : MonoBehaviour
         }
         monsterHitThisAttack = false;
     }
+    public GameObject guardEffectPrefab; // 인스펙터에서 할당
+    private GameObject activeGuardEffect;
 
+    public void ShowGuardEffect(float duration)
+    {
+        if (guardEffectPrefab == null) return;
+
+        if (activeGuardEffect == null)
+        {
+            activeGuardEffect = Instantiate(guardEffectPrefab, transform);
+            activeGuardEffect.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            activeGuardEffect.SetActive(true);
+        }
+
+        StartCoroutine(HideEffectAfterDelay(duration));
+    }
+
+    private IEnumerator HideEffectAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (activeGuardEffect != null)
+        {
+            activeGuardEffect.SetActive(false);
+        }
+    }
     // --- 공격 범위 디버깅 ---
     void OnDrawGizmosSelected()
     {
@@ -303,5 +377,25 @@ public class PlayerAttack : MonoBehaviour
             Gizmos.DrawWireSphere(targetGizmoPos, 0.2f);
             Gizmos.DrawLine(transform.position, targetGizmoPos);
         }
+    }
+    void StartChargingEffect()
+    {
+        currentChargeLevel = 0;
+        nextChargeThreshold = 1f;
+
+        UpdateChargeLevelEffect(currentChargeLevel);
+        currentChargeLevel++; // 0단계가 시작되었으므로 다음은 1단계 기준으로
+        nextChargeThreshold = 1f;
+    }
+
+    void UpdateChargeLevelEffect(int level)
+    {
+        if (level >= chargeLevelEffects.Count) return;
+
+        if (currentChargingEffectInstance != null)
+            Destroy(currentChargingEffectInstance);
+
+        Vector3 spawnPos = transform.position; // 아래 살짝
+        currentChargingEffectInstance = Instantiate(chargeLevelEffects[level], spawnPos, Quaternion.identity, transform);
     }
 }
