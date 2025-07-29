@@ -5,7 +5,7 @@ using UnityEngine;
 /// 진짜 플레이어가 이동하는건 RailFollower에 있지만 여기에서 플레이어 조작을 담당함
 /// player의 중앙시스템 (creature, railfollower, weapon 컴포넌트를 가짐)
 /// </summary>
-public class Player : MonoBehaviour
+public class Player : Creature
 {
     
     //필드
@@ -88,6 +88,13 @@ public class Player : MonoBehaviour
     void ResetDodge()
     {
         dodgeAble = true;
+    }
+    public override void Die() // abstract 메서드이므로 반드시 override
+    {
+        Debug.Log($"{CreatureName} died. Game Over!");
+        // 플레이어 사망 애니메이션, 게임 오버 화면 전환 등
+        // SceneManager.LoadScene("GameOverScene");
+        gameObject.SetActive(false); // 오브젝트 비활성화
     }
 }
 
