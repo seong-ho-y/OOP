@@ -259,7 +259,7 @@ public class PlayerAttack : MonoBehaviour
         if (_railFollowComponent != null)
         {
             _railFollowComponent.enabled = false; // 레일 이동 스크립트 비활성화
-            Debug.Log("공격 시작: 레일 멈춤");
+      //      Debug.Log("공격 시작: 레일 멈춤");
         }
         
         initialPlayerPosition = transform.position; // 공격 시작 위치 저장
@@ -274,7 +274,7 @@ public class PlayerAttack : MonoBehaviour
         {
             attackHitbox.enabled = true;
             hitEnemiesInCurrentAttack.Clear(); 
-            Debug.Log("공격 히트박스 활성화");
+        //    Debug.Log("공격 히트박스 활성화");
         }
 
         // --- 이동 루프: 시간이 끝나거나 몬스터 피격 시까지 ---
@@ -282,7 +282,7 @@ public class PlayerAttack : MonoBehaviour
         {
             if (monsterHitThisAttack) // 몬스터가 피격되어 플래그가 설정되면
             {
-                Debug.Log("몬스터 피격으로 인해 공격 이동 조기 중단.");
+        //        Debug.Log("몬스터 피격으로 인해 공격 이동 조기 중단.");
                 reachedEndNormally = false; // 끝까지 도달하지 못했음을 표시
                 break; // 이동 루프 즉시 종료
             }
@@ -295,11 +295,11 @@ public class PlayerAttack : MonoBehaviour
         if (reachedEndNormally) // 끝까지 도달한 경우에만 최종 위치 보정
         {
             transform.position = targetPosition; 
-            Debug.Log("공격 이동 완료 (목표 Y: " + attackTargetYPosition + "까지 도달).");
+       //     Debug.Log("공격 이동 완료 (목표 Y: " + attackTargetYPosition + "까지 도달).");
         }
         else // 몬스터 피격으로 조기 종료된 경우, 현재 위치에서 복귀 시작
         {
-            Debug.Log("몬스터 피격으로 현재 위치에서 복귀 시작.");
+      //      Debug.Log("몬스터 피격으로 현재 위치에서 복귀 시작.");
             // 위치는 이미 몬스터 피격 시의 위치
         }
         
@@ -307,7 +307,7 @@ public class PlayerAttack : MonoBehaviour
         if (attackHitbox != null)
         {
             attackHitbox.enabled = false;
-            Debug.Log("공격 히트박스 비활성화.");
+       //     Debug.Log("공격 히트박스 비활성화.");
         }
 
         // --- 복귀 로직 시작 ---
@@ -316,14 +316,14 @@ public class PlayerAttack : MonoBehaviour
 
         // 모든 공격 프로세스가 완료된 후 최종 상태 업데이트
         isAttackingMovement = false; // 공격 상태 종료 (재공격 가능)
-        Debug.Log("모든 공격 프로세스 완료.");
+       // Debug.Log("모든 공격 프로세스 완료.");
     }
 
     public IEnumerator ReturnToRailAfterAttack(float moveSpeed)
     {
         Vector3 currentAttackEndPosition = transform.position; // 현재 멈춘 위치에서 복귀 시작
 
-        Debug.Log("레일로 복귀 시작.");
+      //  Debug.Log("레일로 복귀 시작.");
         while (transform.position.y >= initialPlayerPosition.y )
         {
             transform.position -= new Vector3(0, moveSpeed, 0);
@@ -334,7 +334,7 @@ public class PlayerAttack : MonoBehaviour
         if (_railFollowComponent != null)
         {
             _railFollowComponent.enabled = true; // 레일 이동 스크립트 재활성화
-            Debug.Log("레일 이동 재개.");
+       //     Debug.Log("레일 이동 재개.");
         }
         monsterHitThisAttack = false;
         finaldamage = currentWeaponStats.baseDamage;

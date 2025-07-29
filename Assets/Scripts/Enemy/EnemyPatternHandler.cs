@@ -37,7 +37,7 @@ public class EnemyPatternHandler : MonoBehaviour
     // 패턴 1: 돌진
     private IEnumerator MeleeDashPattern()
     {
-        Debug.Log("▶ 근거리 돌진 공격 실행 (아래 방향)");
+        //Debug.Log("▶ 근거리 돌진 공격 실행 (아래 방향)");
 
         Vector2 startPos = transform.position;
         Vector2 targetPos = startPos + Vector2.down * 10f; // 아래로 3 유닛 돌진 (원하는 거리 조절 가능)
@@ -66,14 +66,14 @@ public class EnemyPatternHandler : MonoBehaviour
 
         transform.position = targetPos; // 정확히 목표 위치에 도착하도록 보정
 
-        Debug.Log("돌진 완료!");
+        //Debug.Log("돌진 완료!");
         transform.position = new Vector3(targetPos.x, 4f, 0f);
     }
 
     // 패턴 2: 원거리 발사
     private IEnumerator RangedProjectilePattern()
     {
-        Debug.Log("▶ 원거리 투사체 공격 실행");
+        //Debug.Log("▶ 원거리 투사체 공격 실행");
         
         GameObject proj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Vector2 dir = (player.position - transform.position).normalized;
@@ -85,7 +85,7 @@ public class EnemyPatternHandler : MonoBehaviour
     // 패턴 3: 장판 생성
     private IEnumerator AreaZonePattern()
     {
-        Debug.Log("▶ 장판 공격 실행 (경고 포함)");
+        //Debug.Log("▶ 장판 공격 실행 (경고 포함)");
 
         Vector2 targetPosition = player.position;
 
@@ -118,6 +118,6 @@ public class EnemyPatternHandler : MonoBehaviour
         // 6. 장판 제거
         Destroy(aoe);
 
-        Debug.Log("장판 공격 완료");
+        //Debug.Log("장판 공격 완료");
     }
 }

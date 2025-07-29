@@ -66,7 +66,7 @@ public class Player : Creature
         
         isDodging = true;
         dodgeAble = false;
-        Debug.Log("Dodge");
+        //Debug.Log("Dodge");
         _rail.NudgeIndex(direction);
         _rail.moveSpeed = dodgeSpeed;
         Invoke(nameof(EndDoge), dodgeDuration);

@@ -21,7 +21,7 @@ public class GreatSword : IWeaponAction
 
         // 1. 공격 애니메이션 재생 시작 (플레이어 이동 애니메이션과 동기화)
         // playerAttack.playerAnimator.SetTrigger("GreatSwordDashAttack");
-        Debug.Log("대검 공격 애니메이션 시작");
+        //Debug.Log("대검 공격 애니메이션 시작");
 
         // 2. 공격 이동 시작 (이동하면서 콜라이더 활성화 및 충돌 감지)
         yield return playerAttack.StartCoroutine(playerAttack.PerformAttackMovement(stats.attackMoveSpeed));
@@ -32,11 +32,11 @@ public class GreatSword : IWeaponAction
         {
             int chargeLevel = Mathf.Min(Mathf.FloorToInt(currentChargeTime / (maxChargeTime / 5f)), 5);
             finalDamage = stats.baseDamage * (1 + chargeLevel * 0.2f);
-            Debug.Log($"모아베기 발동! 차징 레벨: {chargeLevel}, 최종 데미지: {finalDamage}");
+        //    Debug.Log($"모아베기 발동! 차징 레벨: {chargeLevel}, 최종 데미지: {finalDamage}");
         }
         else
         {
-            Debug.Log("대검 기본 공격 발동!");
+         //   Debug.Log("대검 기본 공격 발동!");
         }
 
         // --- 중요: AttackHitboxController가 실제 데미지를 주도록 로직을 분리하는 것이 이상적입니다. ---
@@ -48,7 +48,7 @@ public class GreatSword : IWeaponAction
         // 4. 공격 후 플레이어 복귀
         yield return playerAttack.StartCoroutine(playerAttack.ReturnToRailAfterAttack(stats.attackMoveSpeed));
 
-        Debug.Log("대검 공격 프로세스 완료");
+        //Debug.Log("대검 공격 프로세스 완료");
     }
     
     private Coroutine guardCoroutine;
@@ -64,7 +64,7 @@ public class GreatSword : IWeaponAction
 
     private IEnumerator GuardRoutine()
     {
-        Debug.Log("가드 시작");
+        //Debug.Log("가드 시작");
         // 차징 초기화
         playerAttackRef.isCharging = false;
         playerAttackRef.currentChargeTime = 0f;
@@ -88,19 +88,19 @@ public class GreatSword : IWeaponAction
         player.enabled = true;
         _rF.enabled = true;
 
-        Debug.Log("가드 종료");
+       // Debug.Log("가드 종료");
     }
     public void SwipeUp() { Debug.Log("모으기 강화"); }
 
     public void SwipeLeft()
     {
         player.Dodge(-1);
-        Debug.Log("왼쪽 회피 (대검)");
+       // Debug.Log("왼쪽 회피 (대검)");
     }
 
     public void SwipeRight()
     {
         player.Dodge(1);
-        Debug.Log("오른쪽 회피 (대검)");
+        //Debug.Log("오른쪽 회피 (대검)");
     }
 }
