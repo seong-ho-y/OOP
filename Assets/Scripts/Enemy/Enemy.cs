@@ -6,7 +6,7 @@ public class Enemy : Creature // Creature 상속
     [Header("Enemy Specific")]
     public int expOnDeath = 10; // 사망 시 제공할 경험치
 
-    public float deathDelay = 1f;
+    public float deathDelay = 0f;
     
     [Header("Damage Text")]
     public GameObject damageTextPrefab; // Inspector에서 할당할 데미지 텍스트 프리팹
@@ -75,9 +75,7 @@ public class Enemy : Creature // Creature 상속
     {
         Debug.Log($"{CreatureName} has died.");
         // (옵션) 사망 애니메이션, 파티클 이펙트, 사운드 재생
-
-        // 일정 시간 후 오브젝트 파괴 또는 비활성화
-        // 예: Invoke("DestroyEnemy", deathDelay);
+        
         Destroy(gameObject, deathDelay); // deathDelay 시간 후에 게임 오브젝트 파괴
     }
 

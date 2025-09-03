@@ -1386,7 +1386,7 @@ MonoBehaviour:
   _moveSpeed: 5
   _defense: 0
   expOnDeath: 10
-  deathDelay: 1
+  deathDelay: 0
   damageTextPrefab: {fileID: 241295549077430183, guid: f7b69a95fe7a2844492fd6af768410a3, type: 3}
   damageTextSpawnPoint: {fileID: 0}
 --- !u!114 &980625915
