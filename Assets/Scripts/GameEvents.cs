@@ -11,11 +11,11 @@ public static class GameEvents
         OnEnemyDied?.Invoke(enemy);
     }
 
-    public static event Action<List<BaseItemData>, float> OnStageClear;
+    public static event Action<List<BaseItemData>, float, string> OnStageClear;
 
-    public static void ReportStageClear(List<BaseItemData> reward, float clearTime)
+    public static void ReportStageClear(List<BaseItemData> reward, float clearTime, string header)
     {
-        OnStageClear?.Invoke(reward, clearTime);
+        OnStageClear?.Invoke(reward, clearTime, header);
         
     }
 }

@@ -25,11 +25,12 @@ namespace Manager
         #endregion
         
         public GameObject rewardPanel;
+        public TextMeshProUGUI headerText;
         public Transform itemListParent;
         public GameObject rewardItemSlotPrefab;
         public TextMeshProUGUI clearTimeText;
         
-        private void ShowRewardPanel(List<BaseItemData> rewards, float clearTime)
+        private void ShowRewardPanel(List<BaseItemData> rewards, float clearTime, string header)
         {
             // 1. 이전 슬롯 초기화
             foreach (Transform child in itemListParent)
@@ -50,6 +51,9 @@ namespace Manager
                     itemCounts[item] = 1;
                 }
             }
+            // 3-1. 헤더출력
+            headerText.text = header;
+            
             // 3. 클리어 시간
             if (clearTime >= 0)
             {
