@@ -1,3 +1,4 @@
+using Manager;
 using UnityEngine;
 
 /// <summary>
@@ -40,7 +41,14 @@ public class Player : Creature
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Debug.Log("L Pressed");
+            foreach (var i in InventoryManager.Instance.PlayerInventory)
+            {
+                Debug.Log(i.Key);
+            }
+        }
     }
     void OnTriggerEnter2D(Collider2D other)
     {

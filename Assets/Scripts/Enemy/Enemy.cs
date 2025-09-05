@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Enemy : Creature // Creature 상속
 {
+    [Header("Loot")]
+    public LootTable lootTable;
+    
     [Header("Enemy Specific")]
     public int expOnDeath = 10; // 사망 시 제공할 경험치
 
@@ -75,7 +78,7 @@ public class Enemy : Creature // Creature 상속
     {
         Debug.Log($"{CreatureName} has died.");
         // (옵션) 사망 애니메이션, 파티클 이펙트, 사운드 재생
-        
+        GameEvents.ReportEnemyDied(this);
         Destroy(gameObject, deathDelay); // deathDelay 시간 후에 게임 오브젝트 파괴
     }
 

@@ -10,7 +10,7 @@ public class BaseItemData : ScriptableObject, ICraftable
 {
     [Header("Common Item Information")]
     public string itemName = "New Item";
-    public string description = "A generic itme.";
+    public string description = "A generic item.";
     public Sprite icon;
     public int MaxStack = 999;
 

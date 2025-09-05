@@ -5,19 +5,23 @@ namespace Manager
 {
     public class CraftManager : MonoBehaviour
     {
-        public static CraftManager Instance {get; private set;}
+        #region Singleton
+        public static CraftManager Instance { get; private set; }
 
-        void Awake()
+        private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else if (Instance != this)
+            if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
             }
+            else
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
         }
+        
+        #endregion
     
         public bool CanCraft(ICraftable craftableItem)
         {

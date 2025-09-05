@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,10 +6,26 @@ namespace Manager
 {
     public class InventoryManager : MonoBehaviour
     {
+        #region Singleton
         public static InventoryManager Instance { get; private set; }
 
-        // 플레이어가 가지고 있는 재료 딕셔너리
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+        }
+        
+        #endregion
         public Dictionary<BaseItemData, int> PlayerInventory { get; private set; } 
+        // 플레이어가 가지고 있는 재료 딕셔너리
+        
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
@@ -34,7 +51,6 @@ namespace Manager
                 Debug.LogError("Attempted to add null item to inventory.");
                 return;
             }
-
             if (PlayerInventory.ContainsKey(itemData))
             {
                 int currentAmount = PlayerInventory[itemData];
@@ -76,5 +92,27 @@ namespace Manager
             return PlayerInventory.ContainsKey(itemData) && PlayerInventory[itemData] >= amount;
         }
 
+        private void HandleEnemyDied(Enemy enemy)
+        {
+            LootTable lootTable = enemy.lootTable;
+            if (lootTable != null)
+            {
+                List<BaseItemData> items = lootTable.GetDropItem();
+                foreach (var item in items)
+                {
+                    AddItemToInventory(item, 1);
+                }
+
+            }
+        }
+        private void OnEnable()
+        {
+            GameEvents.OnEnemyDied += HandleEnemyDied;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnEnemyDied -= HandleEnemyDied;
+        }
     }
 }
