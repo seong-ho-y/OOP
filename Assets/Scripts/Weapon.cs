@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ElementType { None, Fire, Water, Ice, Thunder, Dragon }
+public enum ElementType { None, Fire, Water, Ice, Lightning, Poison, Paralysis }
 public enum DamageType { Slash, Blunt, Pierce, Explosion } // 참격, 타격, 관통, 폭발
 
 public class WeaponStats
