@@ -23,21 +23,14 @@ namespace Manager
         }
         
         #endregion
-        public Dictionary<BaseItemData, int> PlayerInventory { get; private set; } 
+        
+        public Dictionary<BaseItemData, int> PlayerInventory { get; private set; }
         // 플레이어가 가지고 있는 재료 딕셔너리
-        
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
-        
-        }
 
-        // Update is called once per frame
-        void Update()
+        private void Start()
         {
-        
+            InitializeGameData();
         }
-        
         //초기화 함수
         public void InitializeGameData()
         {
@@ -92,27 +85,25 @@ namespace Manager
             return PlayerInventory.ContainsKey(itemData) && PlayerInventory[itemData] >= amount;
         }
 
+        private void HandleStageLoaded(StageData stageData)
+        {
+            
+        }
         private void HandleEnemyDied(Enemy enemy)
         {
-            LootTable lootTable = enemy.lootTable;
-            if (lootTable != null)
-            {
-                List<BaseItemData> items = lootTable.GetDropItem();
-                foreach (var item in items)
-                {
-                    AddItemToInventory(item, 1);
-                }
-
-            }
+            return;
+            //
         }
         private void OnEnable()
         {
             GameEvents.OnEnemyDied += HandleEnemyDied;
+            GameEvents.OnStageLoaded += HandleStageLoaded;
         }
 
         private void OnDisable()
         {
             GameEvents.OnEnemyDied -= HandleEnemyDied;
+            GameEvents.OnStageLoaded -= HandleStageLoaded;
         }
     }
 }

@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Manager
 {
-    public class RewardUIManager : MonoBehaviour
+    public class RewardManager : MonoBehaviour
     {
         #region Singleton
-        public static RewardUIManager Instance { get; private set; }
+        public static RewardManager Instance { get; private set; }
 
         private void Awake()
         {
@@ -30,6 +30,7 @@ namespace Manager
         public GameObject rewardItemSlotPrefab;
         public TextMeshProUGUI clearTimeText;
         
+
         private void ShowRewardPanel(List<BaseItemData> rewards, float clearTime, string header)
         {
             // 1. 이전 슬롯 초기화
@@ -76,11 +77,13 @@ namespace Manager
             // 5. 활성화
             rewardPanel.SetActive(true);
         }
-    
+
+
         private void OnEnable()
         {
             GameEvents.OnStageClear += ShowRewardPanel;
         }
+
 
         private void OnDisable()
         {
