@@ -1,6 +1,10 @@
 // Enemy.cs
 using UnityEngine;
 
+// 적 타입 관련
+public enum BodyType {Soft, Hard}
+
+
 public class Enemy : Creature // Creature 상속
 {
     [Header("Loot")]

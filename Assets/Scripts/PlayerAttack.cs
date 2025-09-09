@@ -7,7 +7,7 @@ public class PlayerAttack : MonoBehaviour
 {
     // --- 공통 공격 설정 ---
     public IWeaponAction currentWeaponAction; // 현재 장착된 무기 액션 인터페이스
-    public WeaponStats currentWeaponStats;   // 현재 장착된 무기의 스탯 (선택 사항: 데미지 계산 등에 활용)
+    public Weapon currentWeaponStats;   // 현재 장착된 무기의 스탯 (선택 사항: 데미지 계산 등에 활용)
     
 
     public Animator playerAnimator; // 플레이어 애니메이터 (옵션)
@@ -64,7 +64,7 @@ public class PlayerAttack : MonoBehaviour
         _player = GetComponent<Player>();
         _railFollowComponent = GetComponent<RailFollower>();
         // 실제 게임에서는 무기 교체 시스템을 통해 호출될 것입니다.
-        EquipWeapon(new GreatSword(this, _player), new WeaponStats(10f, ElementType.None, DamageType.Slash, 1.0f, 0.2f)); // 초기 무기 장착
+        EquipWeapon(new GreatSword(this, _player), new Weapon()); // 초기 무기 장착
         finaldamage = currentWeaponStats.baseDamage;
         if (attackHitbox != null)
         {
@@ -207,15 +207,15 @@ public class PlayerAttack : MonoBehaviour
         pendingChargeCheck = false;
     }
     // 무기 장착 함수 (외부에서 호출될 수 있도록 public)
-    public void EquipWeapon(IWeaponAction newWeaponAction, WeaponStats newWeaponStats)
+    public void EquipWeapon(IWeaponAction newWeaponAction, Weapon newWeapon)
     {
         currentWeaponAction = newWeaponAction;
-        currentWeaponStats = newWeaponStats;
+        currentWeaponStats = newWeapon;
 
         // 장착된 무기에 따라 차징 지원 여부 설정 (예시)
         weaponSupportsChargeAttack = (newWeaponAction is GreatSword); // 대검이라면 차징 지원
 
-        Debug.Log($"무기 장착: {newWeaponAction.GetType().Name}, 기본 데미지: {newWeaponStats.baseDamage}");
+        Debug.Log($"무기 장착: {newWeaponAction.GetType().Name}, 기본 데미지: {newWeapon.baseDamage}");
 
         // 여기에서 애니메이터 컨트롤러 변경, 모델 교체 등 시각적인 무기 교체 로직 추가
     }

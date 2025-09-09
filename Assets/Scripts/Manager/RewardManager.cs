@@ -33,6 +33,7 @@ namespace Manager
 
         private void ShowRewardPanel(List<BaseItemData> rewards, float clearTime, string header)
         {
+            Debug.Log("ShowRewardPanel Called");
             // 1. 이전 슬롯 초기화
             foreach (Transform child in itemListParent)
             {
@@ -61,7 +62,7 @@ namespace Manager
                 clearTimeText.gameObject.SetActive(true);
                 int minute = (int)clearTime / 60;
                 float second = clearTime % 60;
-                clearTimeText.text = $"{minute:00}:{second:00.00}"; // :과의 조합을 통해 형식 지정도 가능
+                clearTimeText.text = $"{minute:00}:{second:00.00}"; // :과 조합을 통해 형식 지정도 가능
             }
             else
             {

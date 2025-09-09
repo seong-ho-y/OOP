@@ -31,7 +31,7 @@ namespace Manager
                 itemName = baseItemData.itemName;
             }
 
-            // 필요한 재료를 Dictionary<BaseItemData, int> 타입으로 가져옵니다.
+            // 필요한 재료를 Dictionary<BaseItemData, int> 타입으로 가져오기
             Dictionary<BaseItemData, int> requiredMaterials = craftableItem.GetRequiredMaterials();
 
             if (requiredMaterials == null || requiredMaterials.Count == 0)

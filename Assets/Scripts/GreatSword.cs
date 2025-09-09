@@ -17,7 +17,7 @@ public class GreatSword : IWeaponAction
     // IWeaponAction 인터페이스의 Attack 메서드 구현
     public IEnumerator Attack(PlayerAttack playerAttack, bool isCharged, float currentChargeTime = 0f, float maxChargeTime = 0f)
     {
-        WeaponStats stats = playerAttack.currentWeaponStats;
+        Weapon stats = playerAttack.currentWeaponStats;
 
         // 1. 공격 애니메이션 재생 시작 (플레이어 이동 애니메이션과 동기화)
         // playerAttack.playerAnimator.SetTrigger("GreatSwordDashAttack");
