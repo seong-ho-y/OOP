@@ -45,18 +45,62 @@ public class PlayerAttack : MonoBehaviour
 
     [SerializeField] private float chargeHoldDelay = 0.15f; // 몇 초 이상 정지 시 차징으로 간주
     [SerializeField] private float chargeHoldMoveThreshold = 10f; // 이동량이 이 이하일 때만 차징 시작
-
-    // --- 모바일 입력 처리 ---
-    private Vector2 touchStartPosition;
-    private float touchStartTime;
-    public float swipeThreshold = 20f;          // 스와이프 인식을 위한 최소 이동 거리 (픽셀 단위)
-    public float tapMaxDuration = 0.2f;         // 탭 인식을 위한 최대 터치 시간 (초)
     
     // --- 공격 콜라이더 ---
     [Header("Attack Collision")]
     public Collider2D attackHitbox; // 플레이어의 공격 판정용 콜라이더 (Inspector에서 할당)
     private HashSet<Creature> hitEnemiesInCurrentAttack; // 현재 공격에서 이미 타격한 적들
 
+    void OnEnable()
+    {
+        InputManager.OnTap += HandleTap;
+        InputManager.OnSwipe += HandleSwipe;
+        InputManager.OnHoldReleased += HandleHoldRelease;
+    }
+
+    void OnDisable()
+    {
+        InputManager.OnTap -= HandleTap;
+        InputManager.OnSwipe -= HandleSwipe;
+        InputManager.OnHoldReleased -= HandleHoldRelease;
+    }
+
+    private void HandleHoldRelease(float holdTime)
+    {
+        if (isAttackingMovement) return;
+        isAttackingMovement = true;
+        currentAttackCoroutine = StartCoroutine(currentWeaponAction.Attack(this, true, holdTime, maxChargeTime));
+    }
+
+    private void HandleSwipe(InputManager.SwipeDirection direction)
+    {
+        if (isAttackingMovement) return;
+        switch (direction)
+        {
+            case InputManager.SwipeDirection.Up:
+                currentWeaponAction.SwipeUp();
+                break;
+            case InputManager.SwipeDirection.Down:
+                currentWeaponAction.SwipeDown();
+                break;
+            case InputManager.SwipeDirection.Left:
+                currentWeaponAction.SwipeLeft();
+                break;
+            case InputManager.SwipeDirection.Right:
+                currentWeaponAction.SwipeRight();
+                break;
+            default:
+                Debug.LogWarning("Invalid Swipe Direction");
+                break;
+        }
+    }
+
+    private void HandleTap()
+    {
+        if (isAttackingMovement) return;
+        isAttackingMovement = true;
+        currentAttackCoroutine = StartCoroutine(currentWeaponAction.Attack(this, false));
+    }
 
     // 스크립트 시작 시 기본 무기 장착 (테스트용)
     void Start()
@@ -64,7 +108,9 @@ public class PlayerAttack : MonoBehaviour
         _player = GetComponent<Player>();
         _railFollowComponent = GetComponent<RailFollower>();
         // 실제 게임에서는 무기 교체 시스템을 통해 호출될 것입니다.
-        EquipWeapon(new GreatSword(this, _player), new Weapon()); // 초기 무기 장착
+        EquipWeapon(new GreatSword(this, _player), new Weapon());
+        //EquipmentManager.instance.GetEquipItem(EquipmentSlot.Weapon
+        // 초기 무기 장착
         finaldamage = currentWeaponStats.baseDamage;
         if (attackHitbox != null)
         {
@@ -77,111 +123,6 @@ public class PlayerAttack : MonoBehaviour
         hitEnemiesInCurrentAttack = new HashSet<Creature>(); // HashSet 초기화
     }
 
-    void Update()
-    {
-        HandleTouchInput(); // 매 프레임 터치 입력 처리
-        if (isCharging)
-        {
-            currentChargeTime += Time.deltaTime;
-
-            // 다음 단계 도달했는지 확인
-            if (currentChargeTime >= nextChargeThreshold && currentChargeLevel < chargeLevelEffects.Count)
-            {
-                UpdateChargeLevelEffect(currentChargeLevel); // 현재 단계 이펙트로 교체
-                currentChargeLevel++;
-                finaldamage += 15f;
-                nextChargeThreshold += 1f; // 다음 단계 시간 설정
-            }
-        }
-        
-    }
-
-    void HandleTouchInput()
-    {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-
-            if (touch.phase == TouchPhase.Began)
-            {
-                touchStartPosition = touch.position;
-                touchStartTime = Time.time;
-                isCharging = false;
-
-                if (!isAttackingMovement && weaponSupportsChargeAttack)
-                {
-                    pendingChargeCheck = true;
-                    chargeCheckCoroutine = StartCoroutine(DelayedChargeStart(touchStartPosition));
-                }
-            }
-            else if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
-            {
-                if (isCharging)
-                {
-                    currentChargeTime += Time.deltaTime;
-                    _railFollowComponent.enabled = false;
-                    // playerAnimator.SetFloat("ChargeProgress", currentChargeTime / maxChargeTime);
-                }
-            }
-            else if (touch.phase == TouchPhase.Ended)
-            {
-                if (chargeCheckCoroutine != null) StopCoroutine(chargeCheckCoroutine);
-                pendingChargeCheck = false;
-                if (currentChargingEffectInstance != null)
-                {
-                    Destroy(currentChargingEffectInstance);
-                    currentChargingEffectInstance = null;
-                }
-
-                currentChargeLevel = 0;
-                nextChargeThreshold = 1f;
-                float touchDuration = Time.time - touchStartTime;
-                Vector2 touchEndPosition = touch.position;
-                Vector2 swipeVector = touchEndPosition - touchStartPosition;
-                float swipeMagnitude = swipeVector.magnitude;
-
-                if (isAttackingMovement) return;
-
-                if (swipeMagnitude > swipeThreshold)
-                {
-                    isCharging = false;
-
-                    if (Mathf.Abs(swipeVector.y) > Mathf.Abs(swipeVector.x))
-                    {
-                        if (swipeVector.y > 0) currentWeaponAction.SwipeUp();
-                        else currentWeaponAction.SwipeDown();
-                    }
-                    else
-                    {
-                        if (swipeVector.x > 0) currentWeaponAction.SwipeRight();
-                        else currentWeaponAction.SwipeLeft();
-                    }
-                }
-                // 탭 또는 홀드 & 릴리즈 공격 처리
-                else
-                {
-                        // 무기 액션의 Attack 코루틴 시작
-                        // currentAttackCoroutine = StartCoroutine(currentWeaponAction.Attack(this, isCharging, currentChargeTime, maxChargeTime));
-                        // isCharging 상태에 따라 isCharged 인수를 전달
-                        if (touchDuration <= tapMaxDuration)
-                        {
-                            // 탭
-                            isAttackingMovement = true;
-                            currentAttackCoroutine = StartCoroutine(currentWeaponAction.Attack(this, false)); // 차징 아님
-                        }
-                        else
-                        {
-                            // 홀드 & 릴리즈
-                            isAttackingMovement = true;
-                            currentAttackCoroutine =
-                                StartCoroutine(currentWeaponAction.Attack(this, true, currentChargeTime,
-                                    maxChargeTime)); // 차징 맞음
-                        }
-                }
-                isCharging = false; // 터치 종료 시 차징 상태 해제
-            }
-        }
-    }
     private IEnumerator DelayedChargeStart(Vector2 startPos)
     {
         yield return new WaitForSeconds(chargeHoldDelay);

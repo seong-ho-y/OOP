@@ -17,6 +17,7 @@ public class GreatSword : IWeaponAction
     // IWeaponAction 인터페이스의 Attack 메서드 구현
     public IEnumerator Attack(PlayerAttack playerAttack, bool isCharged, float currentChargeTime = 0f, float maxChargeTime = 0f)
     {
+        Debug.Log("공격");
         Weapon stats = playerAttack.currentWeaponStats;
 
         // 1. 공격 애니메이션 재생 시작 (플레이어 이동 애니메이션과 동기화)
@@ -60,6 +61,7 @@ public class GreatSword : IWeaponAction
             playerAttackRef.StopCoroutine(guardCoroutine);
         }
         guardCoroutine = playerAttackRef.StartCoroutine(GuardRoutine());
+        Debug.Log("가드");
     }
 
     private IEnumerator GuardRoutine()
@@ -95,12 +97,12 @@ public class GreatSword : IWeaponAction
     public void SwipeLeft()
     {
         player.Dodge(-1);
-       // Debug.Log("왼쪽 회피 (대검)");
+       Debug.Log("왼쪽 회피 (대검)");
     }
 
     public void SwipeRight()
     {
         player.Dodge(1);
-        //Debug.Log("오른쪽 회피 (대검)");
+        Debug.Log("오른쪽 회피 (대검)");
     }
 }

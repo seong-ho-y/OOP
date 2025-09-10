@@ -319,6 +319,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &216027679
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 216027681}
+  - component: {fileID: 216027680}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &216027680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216027679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1926a93a3cd244141ba221039d3ac07d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swipeThreshold: 20
+  tapMaxDuration: 0.2
+  holdMinDuration: 0.3
+  isHolding: 0
+--- !u!4 &216027681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216027679}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.6181165, y: -0.22080486, z: -0.021122009}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &270262766
 GameObject:
   m_ObjectHideFlags: 0
@@ -739,12 +787,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff67239dce429a949a360a6526b6cc72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentWeaponStats: {fileID: 0}
+  currentWeaponStats: {fileID: 11400000, guid: 9b8455b044fdaa242952595e22edca5d, type: 2}
   playerAnimator: {fileID: 0}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
-  attackTargetYPosition: 4.3
+  attackTargetYPosition: 4.38
   chargeLevelEffects:
   - {fileID: 4150037803692827020, guid: e69412a8bc7e45d42a353e55e71b1dce, type: 3}
   - {fileID: 5428144474991415361, guid: df61128e2d6bdce47981c8d8fe5c91a0, type: 3}
@@ -758,8 +806,6 @@ MonoBehaviour:
   pendingChargeCheck: 0
   chargeHoldDelay: 0.15
   chargeHoldMoveThreshold: 10
-  swipeThreshold: 20
-  tapMaxDuration: 0.2
   attackHitbox: {fileID: 276572518}
   guardEffectPrefab: {fileID: 2216229104968030967, guid: 410bad8a561af8a4a93c5f016728b98d, type: 3}
 --- !u!70 &276572518
@@ -3096,6 +3142,51 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1822655930
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1822655931}
+  - component: {fileID: 1822655932}
+  m_Layer: 0
+  m_Name: EquipmentManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1822655931
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822655930}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.15471695, y: -1.1990589, z: -0.054931954}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1822655932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822655930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb4e1179ac09eb4abd678743844a88f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentEquipment: []
 --- !u!1 &1857375656
 GameObject:
   m_ObjectHideFlags: 0
@@ -3556,3 +3647,5 @@ SceneRoots:
   - {fileID: 1659461769}
   - {fileID: 771010317}
   - {fileID: 529547260}
+  - {fileID: 1822655931}
+  - {fileID: 216027681}

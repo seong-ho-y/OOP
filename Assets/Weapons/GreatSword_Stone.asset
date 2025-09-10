@@ -17,12 +17,14 @@ MonoBehaviour:
   icon: {fileID: 0}
   MaxStack: 999
   craftingMaterials:
-  - MaterialItemData: {fileID: 0}
-    cost: 0
-  - MaterialItemData: {fileID: 0}
-    cost: 0
-  baseDamage: 0
+  - MaterialItemData: {fileID: 11400000, guid: 03312af6ca7dce543b05f8bfe710aa0c, type: 2}
+    cost: 3
+  - MaterialItemData: {fileID: 11400000, guid: c307ab57be2d70f418b7f903164e0fc6, type: 2}
+    cost: 2
+  equipSlot: 5
+  requiredMaterials: []
+  baseDamage: 10
   element: 0
   damageType: 0
-  attackRange: 0
-  attackMoveSpeed: 0
+  attackRange: 10
+  attackMoveSpeed: 10

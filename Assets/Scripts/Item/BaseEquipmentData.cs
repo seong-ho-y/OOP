@@ -35,6 +35,7 @@ public abstract class BaseEquipmentData : BaseItemData, IEquipable, IUpgradable
         return true;
     }
 
+    //UpgradeManager에서 구현할 예정
     public void Upgrade()
     {
         Debug.Log("장비 강화 성공");
