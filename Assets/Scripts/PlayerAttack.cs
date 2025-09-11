@@ -19,7 +19,7 @@ public class PlayerAttack : MonoBehaviour
     private Vector3 initialPlayerPosition; // 공격 시작 전 플레이어 위치
     private bool isAttackingMovement = false; // 공격 이동 중인지 여부
     private Player _player;
-    
+
     // --- 이번 공격으로 몬스터를 타격했는지 여부 ---
     private bool monsterHitThisAttack = false;
     private float finaldamage = 0f;
@@ -51,20 +51,32 @@ public class PlayerAttack : MonoBehaviour
     public Collider2D attackHitbox; // 플레이어의 공격 판정용 콜라이더 (Inspector에서 할당)
     private HashSet<Creature> hitEnemiesInCurrentAttack; // 현재 공격에서 이미 타격한 적들
 
-    void OnEnable()
+    #region Event Subscribe
+
+        void OnEnable()
+        {
+            InputManager.OnTap += HandleTap;
+            InputManager.OnSwipe += HandleSwipe;
+            InputManager.OnHoldReleased += HandleHoldRelease;
+            InputManager.OnHoldStarted += HandleHoldStart;
+        }
+        
+        void OnDisable()
+        {
+            InputManager.OnTap -= HandleTap;
+            InputManager.OnSwipe -= HandleSwipe;
+            InputManager.OnHoldReleased -= HandleHoldRelease;
+            InputManager.OnHoldStarted += HandleHoldStart;
+        }
+        
+    #endregion
+
+    private void HandleHoldStart()
     {
-        InputManager.OnTap += HandleTap;
-        InputManager.OnSwipe += HandleSwipe;
-        InputManager.OnHoldReleased += HandleHoldRelease;
+        throw new System.NotImplementedException();
     }
 
-    void OnDisable()
-    {
-        InputManager.OnTap -= HandleTap;
-        InputManager.OnSwipe -= HandleSwipe;
-        InputManager.OnHoldReleased -= HandleHoldRelease;
-    }
-
+    
     private void HandleHoldRelease(float holdTime)
     {
         if (isAttackingMovement) return;
@@ -72,6 +84,7 @@ public class PlayerAttack : MonoBehaviour
         currentAttackCoroutine = StartCoroutine(currentWeaponAction.Attack(this, true, holdTime, maxChargeTime));
     }
 
+    
     private void HandleSwipe(InputManager.SwipeDirection direction)
     {
         if (isAttackingMovement) return;

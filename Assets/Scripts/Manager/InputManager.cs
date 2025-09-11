@@ -64,6 +64,7 @@ public class InputManager : MonoBehaviour
             // 누르고 있는 상태 감지
             else if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
             {
+                // 근데 홀드 로직은 한자리에서만 하고있어야함 (이거는 if로 분기를 한번 더 쳐?)
                 if (!isHolding && Time.time - touchStartTime > holdMinDuration)
                 {
                     isHolding = true;

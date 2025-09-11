@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GreatSword : IWeaponAction
+public class GreatSword : WeaponAction
 {
     private PlayerAttack playerAttackRef; // PlayerAttack 참조 저
     private Player player;
