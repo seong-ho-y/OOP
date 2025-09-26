@@ -7,6 +7,8 @@ public class GreatSword : WeaponAction
     private PlayerAttack playerAttackRef; // PlayerAttack 참조 저
     private Player player;
     private RailFollower _rF;
+
+    [SerializeField] private bool isChargeUp = false;
     public GreatSword(PlayerAttack paRef, Player p) // 생성자에서 PlayerAttack 참조를 받음
     {
         playerAttackRef = paRef;
@@ -15,7 +17,7 @@ public class GreatSword : WeaponAction
     }
 
     // IWeaponAction 인터페이스의 Attack 메서드 구현
-    public IEnumerator Attack(PlayerAttack playerAttack, bool isCharged, float currentChargeTime = 0f, float maxChargeTime = 0f)
+    public override IEnumerator Attack(PlayerAttack playerAttack, bool isCharged, float currentChargeTime = 0f, float maxChargeTime = 0f)
     {
         Debug.Log("공격");
         Weapon stats = playerAttack.currentWeaponStats;
@@ -54,7 +56,7 @@ public class GreatSword : WeaponAction
     
     private Coroutine guardCoroutine;
 
-    public void SwipeDown()
+    public override void SwipeDown()
     {
         if (guardCoroutine != null)
         {
@@ -92,15 +94,20 @@ public class GreatSword : WeaponAction
 
        // Debug.Log("가드 종료");
     }
-    public void SwipeUp() { Debug.Log("모으기 강화"); }
 
-    public void SwipeLeft()
+    public override void SwipeUp()
+    {
+        Debug.Log("모으기 강화(대검)");
+        isChargeUp = true;
+    }
+
+    public override void SwipeLeft()
     {
         player.Dodge(-1);
        Debug.Log("왼쪽 회피 (대검)");
     }
 
-    public void SwipeRight()
+    public override void SwipeRight()
     {
         player.Dodge(1);
         Debug.Log("오른쪽 회피 (대검)");
